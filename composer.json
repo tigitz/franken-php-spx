@@ -1,0 +1,10 @@
+{
+    "require": {
+        "symfony/config": "^7.1",
+        "symfony/http-kernel": "^7.1",
+        "symfony/http-foundation": "^7.1",
+        "symfony/routing": "^7.1",
+        "symfony/dependency-injection": "^7.1",
+        "symfony/framework-bundle": "^7.1"
+    }
+}

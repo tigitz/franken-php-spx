@@ -6,9 +6,8 @@ COPY --from=composer /usr/bin/composer /usr/bin/composer
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY .tmp/php-spx /tmp/php-spx
-
 RUN apt-get update && apt-get install -y zlib1g-dev git gdb \
+    && git clone --depth=1 https://github.com/NoiseByNorthwest/php-spx.git /tmp/php-spx \
     && cd /tmp/php-spx \
     && phpize \
     && ./configure \
@@ -21,3 +20,5 @@ RUN echo > /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
    && echo 'spx.http_enabled=1' >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
    && echo 'spx.http_key="dev"' >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini \
    && echo 'spx.http_ip_whitelist="*"' >> /usr/local/etc/php/conf.d/docker-php-ext-spx.ini
+
+ENV FRANKENPHP_CONFIG="worker ./index.php"

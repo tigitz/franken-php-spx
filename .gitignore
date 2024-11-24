@@ -5,3 +5,6 @@
 vendor
 var
 .idea
+composer.lock
+.tmp
+

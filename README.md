@@ -1,31 +1,50 @@
-# SPX Issue Reproduction
+# FrankenPHP & SPX integration
 
-This repository demonstrates the issue with SPX UI not showing up in FrankenPHP.
-Issue reference: https://github.com/NoiseByNorthwest/php-spx/issues/258
+This repository provides a Docker-based infrastructure which can help to reproduce or debug issues related to the integration of FrankenPHP with SPX.
 
 ## Setup
 
+First make sure that you have a clone of php-spx located at this relative path `../php-spx`.
+
+Then run the following command to build the image:
+
 ```bash
-# Build and run the container
-docker build -t frankenphp-spx .
-docker run --rm -v $PWD:/app/public -p 80:80 -p 443:443 -p 443:443/udp --tty frankenphp-spx
+./build.sh
 ```
 
-## Testing SPX Web Interface (Not Working)
+And then run FrankenPHP:
 
-1. Run `composer update` to install dependencies
-2. Visit https://localhost/?SPX_KEY=dev&SPX_UI_URI=/
-3. Expected: SPX UI should appear
-4. Actual: SPX UI doesn't show up
+```bash
+docker run --rm -v $PWD:/app/public -p 8501:80 -p 8500:443 -p 8500:443/udp --cap-add=SYS_PTRACE --tty --name frankenphp-spx frankenphp-spx
+> c (continue) / bt (backtrace)
+```
+
+## Starting a debugging session
+
+Run the follwowing command to attach GDB to the FrankendPHP process (frankenphp-spx's PID1):
+
+```bash
+docker exec -it frankenphp-spx gdb -p 1
+```
+
+Then, in GDB's prompt, you will be able to enter commands such as `c` (continue) or `bt` (stack's backtrace).
+
+## Testing SPX Web Interface
+
+Run `composer update` to install dependencies:
+
+```bash
+docker exec frankenphp-spx bash -c  'cd public ; composer update'
+```
+
+Then you can access to SPX's web UI here https://localhost:8500/?SPX_KEY=dev&SPX_UI_URI=/
 
 ## Testing CLI Interface (Working)
 
-1. Get container ID:
-   ```bash
-   docker ps
-   ```
-2. Run CLI test:
-   ```bash
-   docker exec -e SPX_ENABLED=1 -ti CONTAINER_ID php public/cli.php
-   ```
-3. You should see SPX profiling output in the terminal
+Run CLI test:
+
+```bash
+docker exec -e SPX_ENABLED=1 -ti CONTAINER_ID php public/cli.php
+```
+
+You should see SPX profiling output in the terminal
